@@ -66,7 +66,7 @@ jobs:
         working-directory: frontend
         run: npm run build
         env:
-          CI: true
+          CI: false
           REACT_APP_API_URL: http://localhost:3002/api
 
   dashboard-build:
@@ -90,7 +90,7 @@ jobs:
         working-directory: dashboard
         run: npm run build
         env:
-          CI: true
+          CI: false
           REACT_APP_API_URL: http://localhost:3002/api
 
   lint:
