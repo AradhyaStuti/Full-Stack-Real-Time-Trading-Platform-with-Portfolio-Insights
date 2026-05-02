@@ -1,0 +1,280 @@
+paths:
+  /auth/signup:
+    post:
+      tags: [Authentication]
+      summary: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, username, email, password]
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: John Doe
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+                  pattern: "^[a-zA-Z0-9]+$"
+                  example: johndoe
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                  example: securepassword
+      responses:
+        "201":
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email or username already exists
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login with username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: johndoe
+                password:
+                  type: string
+                  example: securepassword
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Logout current user
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: Logged out successfully
+        "401":
+          description: Not authenticated
+
+  /auth/user:
+    get:
+      tags: [Authentication]
+      summary: Get current user profile
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+
+  /holdings:
+    get:
+      tags: [Portfolio]
+      summary: Get user holdings with summary
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: Holdings with computed summary
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          holdings:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Holding"
+                          summary:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                              totalInvestment:
+                                type: number
+                              currentValue:
+                                type: number
+                              totalPnl:
+                                type: number
+                              totalPnlPercent:
+                                type: number
+        "401":
+          description: Not authenticated
+
+  /positions:
+    get:
+      tags: [Portfolio]
+      summary: Get user positions
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: User positions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          positions:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Position"
+        "401":
+          description: Not authenticated
+
+  /orders:
+    get:
+      tags: [Orders]
+      summary: Get user orders (paginated)
+      security:
+        - sessionAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [createdAt, name, price]
+            default: createdAt
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: Paginated orders list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          orders:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Order"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
+        "401":
+          description: Not authenticated
+    post:
+      tags: [Orders]
+      summary: Place a new order
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, qty, price, mode]
+              properties:
+                name:
+                  type: string
+                  maxLength: 20
+                  example: INFY
+                qty:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  example: 5
+                price:
+                  type: number
+                  minimum: 0.01
+                  example: 1500.50
+                mode:
+                  type: string
+                  enum: [BUY, SELL]
+                  example: BUY
+      responses:
+        "201":
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - properties:
+                      data:
+                        properties:
+                          order:
+                            $ref: "#/components/schemas/Order"
+        "400":
+          description: Validation error
+        "401":
+          description: Not authenticated
