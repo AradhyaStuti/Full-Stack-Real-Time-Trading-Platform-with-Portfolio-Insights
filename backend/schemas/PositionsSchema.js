@@ -50,7 +50,6 @@ const PositionsSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      virtuals: true,
       transform: (_, ret) => {
         ret.id = ret._id;
         delete ret.__v;
@@ -59,18 +58,6 @@ const PositionsSchema = new Schema(
     },
   }
 );
-
-PositionsSchema.virtual("currentValue").get(function () {
-  return this.price * this.qty;
-});
-
-PositionsSchema.virtual("pnl").get(function () {
-  return (this.price - this.avg) * this.qty;
-});
-
-PositionsSchema.virtual("isLoss").get(function () {
-  return this.pnl < 0;
-});
 
 PositionsSchema.index({ userId: 1, name: 1 });
 

@@ -41,7 +41,6 @@ const HoldingsSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      virtuals: true,
       transform: (_, ret) => {
         ret.id = ret._id;
         delete ret.__v;
@@ -50,14 +49,6 @@ const HoldingsSchema = new Schema(
     },
   }
 );
-
-HoldingsSchema.virtual("currentValue").get(function () {
-  return this.price * this.qty;
-});
-
-HoldingsSchema.virtual("pnl").get(function () {
-  return (this.price - this.avg) * this.qty;
-});
 
 HoldingsSchema.index({ userId: 1, name: 1 }, { unique: true });
 
