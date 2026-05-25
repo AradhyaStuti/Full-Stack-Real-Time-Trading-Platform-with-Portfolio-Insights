@@ -1,4 +1,5 @@
 const { getAgent, createAndLoginUser } = require("./helpers");
+const { HoldingsModel } = require("../model/HoldingsModel");
 
 describe("Orders API", () => {
   describe("POST /api/orders", () => {
@@ -88,9 +89,17 @@ describe("Orders API", () => {
       expect(res.status).toBe(400);
     });
 
-    it("should create SELL order", async () => {
+    it("should create SELL order when holding covers the qty", async () => {
       const agent = getAgent();
-      await createAndLoginUser(agent);
+      const user = await createAndLoginUser(agent);
+
+      await HoldingsModel.create({
+        userId: user._id,
+        name: "TCS",
+        qty: 5,
+        avg: 3000,
+        price: 3200,
+      });
 
       const res = await agent.post("/api/orders").send({
         name: "TCS",
@@ -101,6 +110,75 @@ describe("Orders API", () => {
 
       expect(res.status).toBe(201);
       expect(res.body.data.order.mode).toBe("SELL");
+    });
+
+    it("should reject SELL when there is no matching holding", async () => {
+      const agent = getAgent();
+      await createAndLoginUser(agent);
+
+      const res = await agent.post("/api/orders").send({
+        name: "TCS",
+        qty: 3,
+        price: 3200,
+        mode: "SELL",
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should create a holding on first BUY", async () => {
+      const agent = getAgent();
+      await createAndLoginUser(agent);
+
+      await agent.post("/api/orders").send({
+        name: "INFY",
+        qty: 5,
+        price: 1500,
+        mode: "BUY",
+      });
+
+      const res = await agent.get("/api/holdings");
+      expect(res.body.data.holdings).toHaveLength(1);
+      expect(res.body.data.holdings[0].name).toBe("INFY");
+      expect(res.body.data.holdings[0].qty).toBe(5);
+      expect(res.body.data.holdings[0].avg).toBe(1500);
+    });
+
+    it("should update avg cost on a second BUY of the same stock", async () => {
+      const agent = getAgent();
+      await createAndLoginUser(agent);
+
+      await agent.post("/api/orders").send({ name: "INFY", qty: 10, price: 1400, mode: "BUY" });
+      await agent.post("/api/orders").send({ name: "INFY", qty: 5, price: 1700, mode: "BUY" });
+
+      const res = await agent.get("/api/holdings");
+      expect(res.body.data.holdings).toHaveLength(1);
+      expect(res.body.data.holdings[0].qty).toBe(15);
+      // (10*1400 + 5*1700) / 15 = 1500
+      expect(res.body.data.holdings[0].avg).toBeCloseTo(1500, 2);
+    });
+
+    it("should delete the holding when SELL clears the qty", async () => {
+      const agent = getAgent();
+      const user = await createAndLoginUser(agent);
+
+      await HoldingsModel.create({
+        userId: user._id,
+        name: "TCS",
+        qty: 3,
+        avg: 3000,
+        price: 3200,
+      });
+
+      await agent.post("/api/orders").send({
+        name: "TCS",
+        qty: 3,
+        price: 3200,
+        mode: "SELL",
+      });
+
+      const res = await agent.get("/api/holdings");
+      expect(res.body.data.holdings).toHaveLength(0);
     });
   });
 
