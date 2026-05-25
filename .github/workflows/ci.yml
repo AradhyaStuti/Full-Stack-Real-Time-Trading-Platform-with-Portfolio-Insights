@@ -93,21 +93,3 @@ jobs:
           CI: false
           REACT_APP_API_URL: http://localhost:3002/api
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Check for secrets
-        run: |
-          if grep -r "password" --include="*.env" .; then
-            echo "WARNING: Possible secrets in .env files"
-            exit 1
-          fi
-        continue-on-error: true

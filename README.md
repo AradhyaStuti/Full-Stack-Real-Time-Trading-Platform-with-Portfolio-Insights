@@ -95,6 +95,16 @@ npm test
 
 39 tests, all integration-style. They spin up an in-memory Mongo (`mongodb-memory-server`) so you don't need a real database. Covers signup/login, order creation and pagination, holdings totals, user isolation, the request-id and helmet middleware, and the health endpoint.
 
+## Known limitations
+
+A few things this project deliberately doesn't do, so they're not surprises in review:
+
+- Prices are simulated. There's a random walk in `backend/socket/index.js` — no real exchange feed.
+- Order settlement is single-step. A BUY upserts into holdings and recomputes a weighted average; a SELL decrements (or deletes the row at zero). No FIFO lots, no clearing-house ledger.
+- Sessions live in process memory. Fine for one dev box; in production you'd swap in `connect-redis` or similar.
+- No CSRF tokens. Session cookies only. For a public deployment I'd add `csurf` or a double-submit pattern.
+- The landing site's copy and product names borrow heavily from Zerodha — it was built to practice React/Bootstrap layout, not as original marketing.
+
 ## A few things worth knowing
 
 - Every record (holdings, orders, positions) is keyed by `userId`, so two accounts in the same database never see each other's data. The tests check for this.

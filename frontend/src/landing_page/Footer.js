@@ -1,6 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+const linkBase = { textDecoration: "none", color: "#555", fontSize: "13px" };
+const onHoverIn = (e) => (e.target.style.color = "#387ed1");
+const onHoverOut = (e) => (e.target.style.color = "#555");
+
+const FooterLink = ({ to, label }) => (
+  <div className="mb-2">
+    <Link to={to} style={linkBase} onMouseEnter={onHoverIn} onMouseLeave={onHoverOut}>
+      {label}
+    </Link>
+  </div>
+);
+
 function Footer() {
   return (
     <footer style={{ backgroundColor: "#fafafa", borderTop: "1px solid #e8eaf0" }}>
@@ -22,14 +34,7 @@ function Footer() {
               { label: "Careers", to: "/" },
               { label: "Press & media", to: "/" },
             ].map(({ label, to }) => (
-              <div key={label} className="mb-2">
-                <Link to={to} style={{ textDecoration: "none", color: "#555", fontSize: "13px" }}
-                  onMouseEnter={(e) => (e.target.style.color = "#387ed1")}
-                  onMouseLeave={(e) => (e.target.style.color = "#555")}
-                >
-                  {label}
-                </Link>
-              </div>
+              <FooterLink key={label} to={to} label={label} />
             ))}
           </div>
           <div className="col-md-3 mb-4 mb-md-0">
@@ -40,14 +45,7 @@ function Footer() {
               { label: "List of charges", to: "/pricing" },
               { label: "Downloads & resources", to: "/" },
             ].map(({ label, to }) => (
-              <div key={label} className="mb-2">
-                <Link to={to} style={{ textDecoration: "none", color: "#555", fontSize: "13px" }}
-                  onMouseEnter={(e) => (e.target.style.color = "#387ed1")}
-                  onMouseLeave={(e) => (e.target.style.color = "#555")}
-                >
-                  {label}
-                </Link>
-              </div>
+              <FooterLink key={label} to={to} label={label} />
             ))}
           </div>
           <div className="col-md-3">
@@ -57,14 +55,7 @@ function Footer() {
               { label: "Fund transfer", to: "/" },
               { label: "60 day challenge", to: "/" },
             ].map(({ label, to }) => (
-              <div key={label} className="mb-2">
-                <Link to={to} style={{ textDecoration: "none", color: "#555", fontSize: "13px" }}
-                  onMouseEnter={(e) => (e.target.style.color = "#387ed1")}
-                  onMouseLeave={(e) => (e.target.style.color = "#555")}
-                >
-                  {label}
-                </Link>
-              </div>
+              <FooterLink key={label} to={to} label={label} />
             ))}
           </div>
         </div>
