@@ -36,7 +36,10 @@ const createApp = () => {
   app.use(express.urlencoded({ extended: false }));
 
   if (config.nodeEnv !== "test") {
-    const morganFormat = config.isProduction ? "combined" : "dev";
+    morgan.token("id", (req) => req.id);
+    const morganFormat = config.isProduction
+      ? ':id :remote-addr :method :url :status :response-time ms'
+      : ':id :method :url :status :response-time ms';
     app.use(
       morgan(morganFormat, {
         stream: { write: (msg) => logger.http(msg.trim()) },

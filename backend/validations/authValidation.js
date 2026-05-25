@@ -16,11 +16,17 @@ const signupSchema = Joi.object({
     "string.email": "Please provide a valid email address",
     "any.required": "Email is required",
   }),
-  password: Joi.string().min(8).max(128).required().messages({
-    "string.min": "Password must be at least 8 characters",
-    "string.max": "Password cannot exceed 128 characters",
-    "any.required": "Password is required",
-  }),
+  password: Joi.string()
+    .min(8)
+    .max(128)
+    .pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters",
+      "string.max": "Password cannot exceed 128 characters",
+      "string.pattern.base": "Password must contain at least one letter and one digit",
+      "any.required": "Password is required",
+    }),
 });
 
 const loginSchema = Joi.object({

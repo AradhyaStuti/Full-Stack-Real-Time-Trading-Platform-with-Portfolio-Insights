@@ -29,7 +29,7 @@ const errorHandler = (err, req, res, next) => {
     return sendError(res, appError.message, appError.statusCode, appError.errors);
   }
 
-  logger.error("Unhandled error:", err);
+  logger.error(`[${req.id}] Unhandled error:`, err);
 
   return sendError(
     res,

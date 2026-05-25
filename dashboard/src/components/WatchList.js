@@ -13,7 +13,7 @@ import {
 } from "@mui/icons-material";
 
 import { watchlist as staticWatchlist } from "../data/data";
-import { DoughnutChart } from "./DoughnoutChart";
+import { DoughnutChart } from "./DoughnutChart";
 
 const WatchList = () => {
   const { prices, connected } = useMarketData();

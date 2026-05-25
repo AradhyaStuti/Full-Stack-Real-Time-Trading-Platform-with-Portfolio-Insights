@@ -8,7 +8,7 @@ describe("Auth API", () => {
         name: "John Doe",
         username: "johndoe",
         email: "john@example.com",
-        password: "securepassword",
+        password: "securepass1",
       });
 
       expect(res.status).toBe(201);
@@ -26,7 +26,7 @@ describe("Auth API", () => {
         name: "Another User",
         username: "another",
         email: "dup@example.com",
-        password: "securepassword",
+        password: "securepass1",
       });
 
       expect(res.status).toBe(409);
@@ -41,7 +41,7 @@ describe("Auth API", () => {
         name: "Another User",
         username: "taken",
         email: "new@example.com",
-        password: "securepassword",
+        password: "securepass1",
       });
 
       expect(res.status).toBe(409);
@@ -67,7 +67,7 @@ describe("Auth API", () => {
         name: "John Doe",
         username: "johndoe",
         email: "notanemail",
-        password: "securepassword",
+        password: "securepass1",
       });
 
       expect(res.status).toBe(400);

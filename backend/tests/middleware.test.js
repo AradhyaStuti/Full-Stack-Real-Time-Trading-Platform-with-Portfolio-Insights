@@ -36,7 +36,7 @@ describe("Middleware", () => {
         name: "John Doe",
         username: "johndoe",
         email: "john@example.com",
-        password: "securepassword",
+        password: "securepass1",
         maliciousField: "should be stripped",
       });
 
@@ -49,7 +49,7 @@ describe("Middleware", () => {
         name: "John Doe",
         username: "john doe!",
         email: "john@example.com",
-        password: "securepassword",
+        password: "securepass1",
       });
 
       expect(res.status).toBe(400);

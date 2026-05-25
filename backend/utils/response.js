@@ -15,10 +15,6 @@ const sendCreated = (res, data, meta = {}) => {
   return sendSuccess(res, data, 201, meta);
 };
 
-const sendNoContent = (res) => {
-  return res.status(204).end();
-};
-
 const sendError = (res, message, statusCode = 500, errors = []) => {
   const response = {
     success: false,
@@ -31,4 +27,4 @@ const sendError = (res, message, statusCode = 500, errors = []) => {
   return res.status(statusCode).json(response);
 };
 
-module.exports = { sendSuccess, sendCreated, sendNoContent, sendError };
+module.exports = { sendSuccess, sendCreated, sendError };
